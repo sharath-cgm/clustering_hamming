@@ -3,9 +3,6 @@ import numpy as np
 from sklearn.metrics.pairwise import euclidean_distances
 
 
-# def lloyd_algo
-
-
 # def kmeans_plusplus: seeding method
 def kmeans_plusplus(X, n_clusters, x_squared_norms, random_state = None, norm = 2):
 	"""
@@ -54,8 +51,8 @@ def kmeans_plusplus(X, n_clusters, x_squared_norms, random_state = None, norm = 
 		# probability = closest_dist_sq
 
 		rand_vals = np.random.uniform(size=n_local_trials) * probability.sum()
-		candidate_ids = np.searchsorted(np.cumsum(probability), rand_vals) ##3
-		# np.clip(candidate_ids, None, closest_dist_sq.size - 1, out=candidate_ids)  ##4
+		candidate_ids = np.searchsorted(np.cumsum(probability, dtype=np.float64), rand_vals) ##3
+		np.clip(candidate_ids, None, closest_dist_sq.size - 1, out=candidate_ids)  ##4
 
 		# Compute distances to center candidates
 		distance_to_candidates = euclidean_distances(
@@ -78,6 +75,81 @@ def kmeans_plusplus(X, n_clusters, x_squared_norms, random_state = None, norm = 
 	return centers
 
 
+# def lloyd_algo
+def lloyd_iter(X, x_squared_norms, centers_old, centers_new, labels, center_shift):
+	
+	
+    # distance between data points and centers
+    pairwise_dist = nd.array
+
+    for i in range(n_samples):
+        for j in range(n_samples):
+            pairwise_dist[i][j] = 1 # todo
+
+    # label data points
+    for i in range(n_samples):
+        min_sq_dist = pairwise_dist[i][0]
+        label = 0
+        for j in range(1, n_clusters):
+            sq_dist = pairwise_dist[i][j]
+            if sq_dist < min_sq_dist:
+                min_sq_dist = sq_dist
+                label = j
+        labels[i] = label
+
+    # update centers
+
+    return 0
+
+def lloyds(X, centers_init, x_squared_norms, max_iter = 300, tol=1e-4):
+    """
+    inputs:
+    X : data
+    centers_init : initial centers
+    x_squared_norms : Precomputed x_squared_norms
+    max_iter : Maximum number of iterations, default = 300
+    tol : default= 1e-4, for convergence with small relative change of centers
+    --------------------
+    outputs:
+    centers : in the last iteration
+    label : label[i] index of centroid the i_th observation is closest to
+
+    """
+
+    n_clusters = centers_init.shape[0]
+
+    # Buffers to avoid new allocations at each iteration.
+    centers = centers_init
+    centers_new = np.zeros_like(centers)
+    labels = np.full(X.shape[0], -1, dtype=np.int32)
+    labels_old = labels.copy()
+    # weight_in_clusters = np.zeros(n_clusters, dtype=X.dtype)
+    center_shift = np.zeros(n_clusters, dtype=X.dtype)
+
+    # strict_convergence = False
+
+    # iterate
+    for i in range(max_iter):
+        lloyd_iter() # todo, no need for function
+
+        centers, centers_new = centers_new, centers
+
+        if np.array_equal(labels, labels_old):
+            # strict_convergence = True
+            break
+        else:
+            center_shift_tot = (center_shift ** 2).sum()
+            if center_shift_tot <= tol:
+                break
+
+        labels_old[:] = labels
+
+    # if not strict_convergence:
+    #   lloyd_iter()
+
+    return labels, centers
+
+
 class Kmeans:
 	def __init__(
 		self,
@@ -86,7 +158,7 @@ class Kmeans:
 		n_init = 10,
 		max_iter = 300,
 		tol = 1e-4,
-		algorithm = "lloyd",
+		# algorithm = "lloyd",
 		random_state = None
 	):
 		self.n_clusters = n_clusters
@@ -94,7 +166,7 @@ class Kmeans:
 		self.n_init = n_init
 		self.max_iter = max_iter
 		self.tol = tol
-		self.algorithm = algorithm
+		# self.algorithm = algorithm
 		self.random_state = random_state
 
 	def _init_centroids(self, X, x_squared_norms, init, random_state):
@@ -119,6 +191,10 @@ class Kmeans:
 		return centers
 
 	def fit(self, X):
+		"""
+		description
+		"""
+
 		# subtract of mean of X for more accurate distance computations
 		X_mean = X.mean(axis=0)
 		X -= X_mean
@@ -143,7 +219,9 @@ class Kmeans:
 				x_squared_norms = x_squared_norms,
 			)
 
-			if best_inertia is None: #or ()**************:
+			## best_accuracy
+
+			if best_inertia is None or (inertia < best_inertia): # and same_clustering
 				best_labels = labels
 				best_centers = centers
 				best_inertia = inertia
