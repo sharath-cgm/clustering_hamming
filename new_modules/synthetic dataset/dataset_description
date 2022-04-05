@@ -1,0 +1,10 @@
+generation(N = 3000, D = 30, k = 10)
+N_3000_1.txt : min_dist = 10
+N_3000_2.txt : min_dist = 9
+N_3000_3.txt : min_dist = 11
+
+generation(N = 10000, D = 50, k = 20)
+N_10000_1.txt : min_dist = 15
+N_10000_2.txt : min_dist = 17
+N_10000_3.txt : min_dist = 16
+

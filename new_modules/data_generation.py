@@ -42,7 +42,7 @@ def generation(N, D, k, alpha = 0.245):
 	centers= np.random.randint(2, size= (k, D))
 	labels = list(range(k))
 
-	data = np.array(centers)
+	data = np.array(centers, dtype = int)
 	# Add N/k - 1 points into each cluster
 	n_samples = int(N/k - 1)
 	for i in range(k):
@@ -60,12 +60,15 @@ def generation(N, D, k, alpha = 0.245):
 
 	return data, centers, labels
 
-
-# data, centers, labels = generation(N = 3000, D = 30, k = 20)
-data, centers, labels = generation(N = 50000, D = 50, k = 100)
+# data, centers, labels = generation(N = 2000, D = 50, k = 10)
+data, centers, labels = generation(N = 10000, D = 50, k = 20)
+# print(type(data[0][0]))
+# data, centers, labels = generation(N = 50000, D = 50, k = 100)
 # print(data.shape)
 # print("\n\n",centers)
-np.savetxt("N_50000.csv", np.append(data, labels, axis = 1), delimiter=",")
+# np.savetxt("N_3000_2.txt", np.append(data, labels, axis = 1), delimiter=" ")
+np.savetxt("N_10000.txt", np.append(data, labels, axis = 1), delimiter=" ")
+
 
 
 unique_entries, _ = (np.unique(data, axis=0)).shape

@@ -1,3 +1,8 @@
+"""
+todo:
+
+"""
+
 import numpy as np
 from sklearn.metrics.pairwise import manhattan_distances
 
@@ -27,6 +32,8 @@ def max_ones(data, chosen_centers):
 
 def seeding1(data, n_clusters):
 	"""
+	Implementation based on approximation algorithm of a set cover
+
 	data : data in hamming metric
 	n_clusters : number of seeds to choose, 'k'
 
