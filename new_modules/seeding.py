@@ -88,7 +88,7 @@ def seeding2(data, n_clusters):
 
 	# Pick the remaining n_clusters-1 points
 	for c in range(1, n_clusters):
-		print(closest_dist)
+		# print(closest_dist)
 		# Choose center candidate by finding the farthest to existing center
 		center_index = np.argmax(closest_dist)
 		centers[c] = data[center_index]
@@ -99,11 +99,13 @@ def seeding2(data, n_clusters):
 		# update closest distances
 		np.minimum(closest_dist, new_dist, out=closest_dist)
 
+	# print(type(centers))
+
 	return centers
 
-data = np.array([ [0, 0, 0, 0, 0, 0], [1,1, 0, 1, 1, 1], [1, 1, 1, 1, 1, 1],  [0, 0, 0, 0, 0, 1], [1,1,1,0,0,0], [1,1,1,1,0,0] ])
+# data = np.array([ [0, 0, 0, 0, 0, 0], [1,1, 0, 1, 1, 1], [1, 1, 1, 1, 1, 1],  [0, 0, 0, 0, 0, 1], [1,1,1,0,0,0], [1,1,1,1,0,0] ])
 
-print("\ncenters:")
-print(seeding2(data, 3))
+# print("\ncenters:")
+# print(seeding2(data, 3))
 # print(data)
 # print(max_ones(data))

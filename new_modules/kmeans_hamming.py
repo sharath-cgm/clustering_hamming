@@ -19,6 +19,7 @@ class Kmeans:
 		n_init = 50,
 		max_iter = 300,
 		tol = 1e-4,
+		# seed = None,
 		# algorithm = "lloyd",
 		# random_state = None,
 		accuracy_list = []
@@ -30,9 +31,10 @@ class Kmeans:
 		self.tol = tol
 		# self.algorithm = algorithm
 		# self.random_state = random_state
+		# self.seed = seed,
 		self.accuracy_list = accuracy_list
 
-	def _init_centroids(self, X, x_squared_norms, init):
+	def _init_centroids(self, X, init, input_seed = None):
 		"""
 			return centers
 		"""
@@ -48,15 +50,17 @@ class Kmeans:
 				# x_squared_norms = x_squared_norms,
 			)
 		elif init == "seeding2":
-			centers = seeding1(X, n_clusters)
+			centers = seeding2(X, n_clusters)
 		elif init == "random":
 			seeds = np.random.permutation(n_samples)[:n_clusters]
 			centers = X[seeds]
+		elif init == "input_seed":
+			centers = input_seed
 
 		return centers
 
 
-	def fit(self, X, true_labels = None):
+	def fit(self, X, true_labels = None, input_seed = None):
 		"""
 		X: data
 		true_labels: Actual labels of data from the dataset; to get the epoch with max. accuracy against the generic max. inertia
@@ -79,7 +83,7 @@ class Kmeans:
 		for i in range(self.n_init):
 			# initialize centers
 			centers_init = self._init_centroids(
-				X, x_squared_norms = x_squared_norms, init = self.init
+				X, init = self.init, input_seed = input_seed
 			)
 
 			# run lloyd's algo
