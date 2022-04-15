@@ -24,7 +24,7 @@ def flip(center, alpha):
 			new[i] = 1 - new[i]
 	return new
 
-def generation(N, D, k, alpha = 0.245):
+def generation(N, D, k, alpha = 0.2):
 	"""
 	Input:
 	N : number of samples to generated
@@ -66,6 +66,8 @@ def generation(N, D, k, alpha = 0.245):
 # data, centers, labels = generation(N = 100000, D = 1000, k = 2)
 # data, centers, labels = generation(N = 500000, D = 50, k = 2)
 # data, centers, labels = generation(N = 500000, D = 50, k = 20000)
+data, centers, labels = generation(N = 100000, D = 100, k = 20)
+
 
 # print(type(data[0][0]))
 # data, centers, labels = generation(N = 50000, D = 50, k = 100)
@@ -73,7 +75,7 @@ def generation(N, D, k, alpha = 0.245):
 # print("\n\n",centers)
 # np.savetxt("N_3000_2.txt", np.append(data, labels, axis = 1), delimiter=" ")
 print("writing")
-np.savetxt("N_100000.txt", np.append(data, labels, axis = 1), delimiter=" ")
+np.savetxt("N_100000_1.txt", np.append(data, labels, axis = 1), delimiter=" ")
 
 
 
