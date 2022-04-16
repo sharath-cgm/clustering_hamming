@@ -28,6 +28,15 @@ def accuracy_analysis(accuracy_list):
 
 	return None
 
+def f1_analysis(f1_list):
+	average = np.average(f1_list)
+	standard_deviation = np.std(f1_list)
+	maximum = max(f1_list)
+
+	print("F1-score Analysis: Average = ", average, " ; Standard Deviation = ", standard_deviation, "; Best F1_score = ", maximum)
+
+	return None
+
 def inertia_analysis(inertia_list):
 	average = np.average(inertia_list)
 	standard_deviation = np.std(inertia_list)

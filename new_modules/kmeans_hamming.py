@@ -2,8 +2,9 @@ import random
 import numpy as np
 from cluster_labelling import labelling
 from sklearn.metrics.pairwise import manhattan_distances
-from seeding import seeding1, seeding2
+from seeding import seeding1, seeding2, kmeans_plusplus
 from lloyd_substitute import lloyd_substitute
+from sklearn.metrics import accuracy_score, f1_score
 
 class Kmeans:
 	"""
@@ -16,46 +17,42 @@ class Kmeans:
 		self,
 		n_clusters = 2,
 		init = "random",
-		n_init = 50,
-		max_iter = 300,
-		tol = 1e-4,
+		n_init = 10,
+		max_iter = 50,
+		# tol = 1e-4,
 		# seed = None,
 		# algorithm = "lloyd",
 		# random_state = None,
-		accuracy_list = []
+		# accuracy_list = [],
+		# f1_list = []
 	):
 		self.n_clusters = n_clusters
 		self.init = init
 		self.n_init = n_init
 		self.max_iter = max_iter
-		self.tol = tol
+		# self.tol = tol
 		# self.algorithm = algorithm
 		# self.random_state = random_state
 		# self.seed = seed,
-		self.accuracy_list = accuracy_list
+		# self.accuracy_list = list(accuracy_list),
+		# self.f1_list = f1_list
 
-	def _init_centroids(self, X, init, input_seed = None):
+	def _init_centroids(self, X, init):
 		"""
 			return centers
 		"""
 		n_samples = X.shape[0]
 		n_clusters = self.n_clusters
 
-
-		if init == "seeding1":
-			centers = seeding1(
-				X,
-				n_clusters
-				# random_state = random_state,
-				# x_squared_norms = x_squared_norms,
-			)
-		elif init == "seeding2":
-			centers = seeding2(X, n_clusters)
+		# if init == "seeding1":
+		# 	centers = seeding1(X, n_clusters)
+		# elif init == "seeding2":
+		# 	centers = seeding2(X, n_clusters)
+		if init == "k-means++":
+			centers = kmeans_plusplus(X, self.n_clusters)
 		elif init == "random":
 			seeds = np.random.permutation(n_samples)[:n_clusters]
 			centers = X[seeds]
-		elif init == "input_seed":
-			centers = input_seed
 
 		return centers
 
@@ -64,6 +61,7 @@ class Kmeans:
 		"""
 		X: data
 		true_labels: Actual labels of data from the dataset; to get the epoch with max. accuracy against the generic max. inertia
+		input_seed: Hard-code the 
 
 		Returns:
 		centers, labels
@@ -71,57 +69,49 @@ class Kmeans:
 
 		n_samples = X.shape[0]
 
-		# subtract of mean of X for more accurate distance computations
-		# X_mean = X.mean(axis=0)
-		# X -= X_mean
+		self.accuracy_list = []
+		self.f1_list = []
 
-		# precompute squared norms of data points
-		# x_squared_norms = np.reshape((X ** 2).sum(axis=1), (n_samples, 1))
-
-		best_accuracy, best_inertia, best_labels = None, None, None
+		# best_accuracy, best_f1_score, best_labels = None, None, None
 
 		for i in range(self.n_init):
 			# initialize centers
-			centers_init = self._init_centroids(
-				X, init = self.init, input_seed = input_seed
-			)
+			if input_seed == None:
+				centers_init = self._init_centroids(X, init = self.init)
+			else:
+				centers_init = input_seed
 
 			# run lloyd's algo
-			# labels, inertia, centers, n_iter_ = lloyds(X, centers_init,	x_squared_norms)
-			labels, inertia, centers = lloyd_substitute(X, centers_init)
-				# max_iter = self.max_iter,
-				# tol = self.tol
-				# x_squared_norms = 
-			# )
+			# labels, inertia, centers = lloyd_substitute(X, centers_init, self.max_iter, true_labels)
+			labels, centers, accuracy_iter = lloyd_substitute(X, centers_init, self.max_iter, true_labels)
+			# self.accuracy = accuracy_iter
+			print(accuracy_iter, len(accuracy_iter))
+
 
 			# compute accuracy
-
 			if true_labels is not None:
 				## best_accuracy
-				accuracy = labelling(labels, true_labels, self.n_clusters, only_accuracy = True)
-				(self.accuracy_list).append(accuracy)
-				if best_accuracy is None or (accuracy > best_accuracy):
-					best_labels = labels
-					best_centers = centers
-					best_accuracy = accuracy
+				predicted_labels = labelling(labels, true_labels, self.n_clusters, n_samples)
+				(self.accuracy_list).append(accuracy_score(labels, true_labels))
+				(self.f1_list).append(f1_score(labels, true_labels, average='macro'))
+				# if best_accuracy is None or (accuracy > best_accuracy):
+				# 	best_labels = labels
+				# 	best_centers = centers
+				# 	best_accuracy = accuracy
 					# best_n_iter = n_iter_
-			else:
-				## best_inertia
-				if best_inertia is None or (inertia < best_inertia): # and same_clustering
-					best_labels = labels
-					best_centers = centers
-					best_inertia = inertia
+			# else:
+			# 	## best_inertia
+			# 	if best_inertia is None or (inertia < best_inertia): # and same_clustering
+			# 		best_labels = labels
+			# 		best_centers = centers
+			# 		best_inertia = inertia
 					# best_n_iter = n_iter_
-
-		# ***** selfcopy*****
-		# X += X_mean
-		# best_centers += X_mean
-
 
 		# returning
-		self.cluster_centers_ = best_centers
-		self.labels_ = best_labels
-		self.inertia_ = best_inertia
+		# self.cluster_centers_ = best_centers
+		# self.labels_ = best_labels
+		# self.inertia_ = best_inertia
 		# self.n_iter_ = best_n_iter
+
 
 		return self

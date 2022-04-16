@@ -4,9 +4,12 @@ todo: manhattan distance is expensive, XOR and count number of 1s maybe is effic
 """
 from sklearn.metrics.pairwise import manhattan_distances
 import numpy as np
+from cluster_labelling import labelling
+from sklearn.metrics import accuracy_score
+
 
 # def lloyds(X, centers_init, x_squared_norms, max_iter = 300, tol=1e-4):
-def lloyd_substitute(X, centers_init, max_iter = 300):
+def lloyd_substitute(X, centers_init, max_iter, true_labels = None):
 	n_samples, n_features = X.shape
 	# print(type(np.array(centers_init)))
 	n_clusters = centers_init.shape[0]
@@ -22,9 +25,11 @@ def lloyd_substitute(X, centers_init, max_iter = 300):
 	coordinate_count = np.zeros(shape= (n_clusters, n_features))
 	total_count = np.zeros(shape = n_clusters)
 
+	accuracy = []
+
 	# iterate- lloyds algorithm
 	for iter in range(max_iter):
-		# print(iter,centers)
+		# print(iter)
 		# compute dist to all centers
 		# print(X.shape, centers.shape)
 		pairwise_dist = manhattan_distances(X = X, Y = centers)
@@ -46,19 +51,20 @@ def lloyd_substitute(X, centers_init, max_iter = 300):
 		# print(labels)
 		centers = np.zeros(shape = (n_clusters, n_features))
 		
-		t = 5 # hyperparameter in Tanh function
+		t = 10 # hyperparameter in Tanh function, tried t = 5, 10, 12, 20
 		for j in range(n_clusters):
 			rand_flips = np.random.uniform(size = n_features)
 			for k in range(n_features):
 				# probabilistic approach using Tanh function
 				p = coordinate_count[j][k]/ total_count[j]
 				if rand_flips[k] < 0.5*(np.tanh(t*(p-0.5)) + 1):
-					centers[j][k] = 1
-				else:
-					centers[j][k] = 0
-				
+					centers[j][k] = 1				
 
-
+				# simple majority based approach
+				# if coordinate_count[j][k] > total_count[j] * 0.5: 
+				# 	centers[j][k] = 1
+					
+				# trial 1
 				# p = coordinate_count[j][k]/ total_count[j]
 				# if p > 0.5:
 				# 	if rand_flips[k] < 1 - 8 * (1-p)**4:
@@ -67,8 +73,6 @@ def lloyd_substitute(X, centers_init, max_iter = 300):
 				# 	if rand_flips[k] < 8 * p**4:
 				# 		centers[j][k] = 1
 
-				# if coordinate_count[j][k] > total_count[j] * 0.5: # simple majority based approach
-				# 	centers[j][k] = 1
 
 		if np.array_equal(labels, labels_old): # convergence condition #2 : when labels don't change
 			# strict_convergence = True
@@ -76,12 +80,18 @@ def lloyd_substitute(X, centers_init, max_iter = 300):
 
 		labels_old[:] = labels
 
-	# compute inertia
-	inertia = 0.0
-	for j in range(n_samples):
-		inertia += pairwise_dist[j][labels[j]]**2
+		if true_labels is not None:
+			predicted_labels = labelling(labels, true_labels, n_clusters, n_samples)
+			accuracy.append(accuracy_score(true_labels, predicted_labels))
+		
 
-	return labels, inertia, centers
+	# compute inertia
+	# inertia = 0.0
+	# for j in range(n_samples):
+	# 	inertia += pairwise_dist[j][labels[j]]**2
+
+	# return labels, inertia, centers, accuracy
+	return labels, centers, accuracy
 
 
 # class Kmeans:
