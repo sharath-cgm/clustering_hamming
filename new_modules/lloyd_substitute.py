@@ -80,9 +80,9 @@ def lloyd_substitute(X, centers_init, max_iter, true_labels = None):
 
 		labels_old[:] = labels
 
-		if true_labels is not None:
-			predicted_labels = labelling(labels, true_labels, n_clusters, n_samples)
-			accuracy.append(accuracy_score(true_labels, predicted_labels))
+		# if true_labels is not None:
+		# 	predicted_labels = labelling(labels, true_labels, n_clusters, n_samples)
+		# 	accuracy.append(accuracy_score(true_labels, predicted_labels))
 		
 
 	# compute inertia

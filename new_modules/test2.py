@@ -34,7 +34,7 @@ accuracy_list = []
 print("Based on best accuracy, random seeding: ")
 # for i in range(5):
 	# print(i)
-kmeans = Kmeans(init="random", n_clusters=n_clusters, n_init= 50, max_iter = 20)
+kmeans = Kmeans(init="random", n_clusters=n_clusters, n_init= 50, max_iter = 50)
 # kmeans = Kmeans(init="seeding2", n_clusters=n_clusters, n_init=1)
 kmeans.fit(data, true_labels = labels) #, input_seed = seed)
 

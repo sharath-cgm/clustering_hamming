@@ -75,6 +75,8 @@ class Kmeans:
 		# best_accuracy, best_f1_score, best_labels = None, None, None
 
 		for i in range(self.n_init):
+			print(i)
+
 			# initialize centers
 			if input_seed == None:
 				centers_init = self._init_centroids(X, init = self.init)
@@ -85,7 +87,7 @@ class Kmeans:
 			# labels, inertia, centers = lloyd_substitute(X, centers_init, self.max_iter, true_labels)
 			labels, centers, accuracy_iter = lloyd_substitute(X, centers_init, self.max_iter, true_labels)
 			# self.accuracy = accuracy_iter
-			print(accuracy_iter, len(accuracy_iter))
+			# print(accuracy_iter, len(accuracy_iter))
 
 
 			# compute accuracy
