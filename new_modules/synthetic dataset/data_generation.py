@@ -14,16 +14,6 @@ def quality_data(centers):
 
 	return min_dist
 
-def flip(center, alpha):
-	D = center.shape[0]
-	rand_flips = np.random.uniform(size = D)
-	new = np.copy(center)
-
-	for i in range(D):
-		if rand_flips[i] < alpha:
-			new[i] = 1 - new[i]
-	return new
-
 def generation(N, D, k, alpha = 0.2):
 	"""
 	Input:
@@ -40,33 +30,30 @@ def generation(N, D, k, alpha = 0.2):
 
 	# randomly choose k D-dimensional centers
 	centers= np.random.randint(2, size= (k, D))
-	labels = list(range(k))
+	labels = np.array([list(range(k))])
 
 	data = np.array(centers, dtype = int)
 	# Add N/k - 1 points into each cluster
 	n_samples = int(N/k - 1)
 	for i in range(k):
-		# print(i)
-		for j in range(n_samples):
-			# print(j)
-			# new = centers[i] flip into prob. alpha
-			# print(j)
-			new = flip(centers[i], alpha)
-			# print(new)
-			data = np.append(data, [new], axis=0)
+		rand_flips = np.random.uniform(size = (n_samples, D)) < alpha
+		samples_cluster = np.tile(centers[i], (n_samples, 1))
+		np.logical_not(samples_cluster, out = samples_cluster, where = rand_flips)
+		data = np.concatenate((data, samples_cluster), axis = 0)
 
-			# check if already present in data
-			labels.append(i)
+		label_tiled = np.tile([i], (1, n_samples))
+		labels = np.concatenate((labels, label_tiled), axis = 1)
 
-	labels = (np.array([labels])).transpose()
+	data = np.concatenate((data, labels.transpose()) , axis = 1)
 
-	return data, centers, labels
+	return data, centers
 
+N, D, k = 10000, 100, 20
 # data, centers, labels = generation(N = 100000, D = 1000, k = 10000)
 # data, centers, labels = generation(N = 100000, D = 1000, k = 2)
 # data, centers, labels = generation(N = 500000, D = 50, k = 2)
 # data, centers, labels = generation(N = 500000, D = 50, k = 20000)
-data, centers, labels = generation(N = 100000, D = 100, k = 20)
+data, centers = generation(N, D, k)
 
 
 # print(type(data[0][0]))
@@ -74,9 +61,10 @@ data, centers, labels = generation(N = 100000, D = 100, k = 20)
 # print(data.shape)
 # print("\n\n",centers)
 # np.savetxt("N_3000_2.txt", np.append(data, labels, axis = 1), delimiter=" ")
-print("writing")
-np.savetxt("N_100000_1.txt", np.append(data, labels, axis = 1), delimiter=" ")
-
+# print("writing")
+# np.savetxt("N_10000_1.csv", data, delimiter=" ")
+filename = "N" + str(N) + "_D" + str(D) + "_k" + str(k) + "_1"
+np.savetxt(filename + ".txt", data, fmt = '%u', delimiter=" ")
 
 
 unique_entries, _ = (np.unique(data, axis=0)).shape
