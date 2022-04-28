@@ -8,9 +8,9 @@ from kmeans_hamming import Kmeans
 
 # synthetic dataset
 # dataset = "digit_hamming_2.txt"
-dataset = "N_10000.txt"
+dataset = "N100000_D100_k10_1.txt"
 print(dataset)
-data = np.loadtxt(dataset, dtype=float)
+data = np.loadtxt(dataset)
 data = data.astype(int)
 labels = data[:, -1]
 data = data[:, 0:-1]
@@ -31,10 +31,10 @@ print(f"# clusters: {n_clusters}; # samples: {n_samples}; # features {n_features
 best_accuracy, f1, inertia, pred_labels = None, None, None, None
 accuracy_list = []
 # print("Based on best accuracy, k-means++ seeding: ")
-print("Based on best accuracy, random seeding: ")
+# print("Based on best accuracy, random seeding: ")
 # for i in range(5):
 	# print(i)
-kmeans = Kmeans(init="random", n_clusters=n_clusters, n_init= 50, max_iter = 50)
+kmeans = Kmeans(init="random", n_clusters=n_clusters, n_init= 50, max_iter = 10)
 # kmeans = Kmeans(init="seeding2", n_clusters=n_clusters, n_init=1)
 kmeans.fit(data, true_labels = labels) #, input_seed = seed)
 
