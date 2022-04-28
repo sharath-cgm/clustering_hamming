@@ -75,7 +75,7 @@ class Kmeans:
 		# best_accuracy, best_f1_score, best_labels = None, None, None
 
 		for i in range(self.n_init):
-			print(i)
+			print("epoch number: ", i)
 
 			# initialize centers
 			if input_seed == None:
@@ -85,7 +85,8 @@ class Kmeans:
 
 			# run lloyd's algo
 			# labels, inertia, centers = lloyd_substitute(X, centers_init, self.max_iter, true_labels)
-			labels, centers, accuracy_iter = lloyd_substitute(X, centers_init, self.max_iter, true_labels)
+			# labels, centers, accuracy_iter = lloyd_substitute(X, centers_init, self.max_iter, true_labels)
+			labels, centers = lloyd_substitute(X, centers_init, self.max_iter, true_labels)
 			# self.accuracy = accuracy_iter
 			# print(accuracy_iter, len(accuracy_iter))
 
