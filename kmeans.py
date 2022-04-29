@@ -6,14 +6,16 @@ class Kmeans with methods: _init_centroids, fit, running for best accuacy
 todo:
 inertia function- order = 2, for general order : test
 def _center_shift
+# without center_shift, centers_new isnt necessary
 best accuracy vs inertia- test, make list
-test lloyd's algo
+test lloyd's algo - done, ok
 """
 
 import random
 import numpy as np
 from sklearn.metrics.pairwise import euclidean_distances
 from cluster_labelling import labelling
+from sklearn.metrics import accuracy_score
 
 
 def compute_inertia(X, centers, labels, X_squared_norms, order = 2):
@@ -64,7 +66,7 @@ def kmeans_plusplus(X, n_clusters, x_squared_norms, random_state = None, norm = 
 
 	# Initialize list of closest distances and calculate current potential
 	# print(X.shape, x_squared_norms.shape)
-	closest_dist_sq = euclidean_distances(X = centers[0, np.newaxis], Y = X, Y_norm_squared=x_squared_norms, squared=True)
+	closest_dist_sq = euclidean_distances(X = centers[0, np.newaxis], Y = X, Y_norm_squared= np.reshape(x_squared_norms, (1, n_samples)), squared=True)
 	current_pot = closest_dist_sq.sum()
 	# print(closest_dist_sq, type(closest_dist_sq))
 
@@ -87,7 +89,7 @@ def kmeans_plusplus(X, n_clusters, x_squared_norms, random_state = None, norm = 
 
 		# Compute distances to center candidates
 		distance_to_candidates = euclidean_distances(
-		  X[candidate_ids], X, Y_norm_squared=x_squared_norms, squared=True
+			X[candidate_ids], X, Y_norm_squared=np.reshape(x_squared_norms, (1, n_samples)), squared=True
 		)
 
 		# update closest distances squared and potential for each candidate
@@ -106,7 +108,7 @@ def kmeans_plusplus(X, n_clusters, x_squared_norms, random_state = None, norm = 
 	return centers
 
 
-def lloyds(X, centers_init, x_squared_norms, max_iter = 300, tol=1e-4):
+def lloyds(X, centers_init, x_squared_norms, max_iter, true_labels = None, tol=1e-4):
 	"""
 	inputs:
 	X : data
@@ -131,9 +133,11 @@ def lloyds(X, centers_init, x_squared_norms, max_iter = 300, tol=1e-4):
 	labels = np.full(X.shape[0], -1, dtype=np.int32)
 	labels_old = labels.copy()
 	# count_in_clusters = np.zeros(n_clusters, dtype=X.dtype) # count of samples in each cluster
-	center_shift = np.zeros(n_clusters, dtype=X.dtype)
+	# center_shift = np.zeros(n_clusters, dtype=X.dtype)
 	pairwise_dist = np.zeros((n_samples, n_clusters), dtype=X.dtype)
 	# strict_convergence = False
+
+	accuracy = []
 
 	# iterate- lloyds algorithm
 	for _ in range(max_iter): # convergence condition #1 : run for max_iter number of times
@@ -143,7 +147,7 @@ def lloyds(X, centers_init, x_squared_norms, max_iter = 300, tol=1e-4):
 
 		# label data points and update centers
 		count_in_clusters = np.ones(n_clusters)  # count of samples in each cluster
-		centers_new = np.zeros_like(centers)
+		centers_new = np.zeros_like(centers) 	# without center_shift, centers_new isnt necessary
 		for j in range(n_samples):
 			labels[j] = np.argmin(pairwise_dist[j])
 
@@ -168,16 +172,26 @@ def lloyds(X, centers_init, x_squared_norms, max_iter = 300, tol=1e-4):
 
 		labels_old[:] = labels
 
+		# compute accuracy
+		if true_labels is not None:
+			predicted_labels = labelling(labels, true_labels, n_clusters, n_samples)
+			accuracy.append(accuracy_score(true_labels, predicted_labels))
+		# print(accuracy)
+
+
     # if not strict_convergence:
     #   lloyd_iter()
 
 	# compute inertia
-	inertia = 0.0
-	for j in range(n_samples):
-		inertia += pairwise_dist[j][labels[j]]**2
+	# inertia = 0.0
+	# for j in range(n_samples):
+	# 	inertia += pairwise_dist[j][labels[j]]**2
 
+	print(accuracy)
+	# return labels, inertia, centers, accuracy
+	return labels, centers
+	# return labels, centers, accuracy
 
-	return labels, inertia, centers
 
 
 class Kmeans:
@@ -228,7 +242,7 @@ class Kmeans:
 
 		return centers
 
-	def fit(self, X, true_labels = None):
+	def fit(self, X, true_labels):
 		"""
 		X: data
 		true_labels: Actual labels of data from the dataset; to get the epoch with max. accuracy against the generic max. inertia
@@ -249,14 +263,22 @@ class Kmeans:
 		best_accuracy, best_inertia, best_labels = None, None, None
 
 		for i in range(self.n_init):
+			# print("Epoch: ", i)
+
 			# initialize centers
 			centers_init = self._init_centroids(
 				X, x_squared_norms = x_squared_norms, init = self.init
 			)
 
 			# run lloyd's algo
+			labels, centers = lloyds(X, centers_init, x_squared_norms, max_iter = self.max_iter, true_labels = true_labels)
+			# labels, inertia, centers, accuracy_iter = lloyds(X, centers_init, x_squared_norms, true_labels)
+			# labels, centers, accuracy_iter = lloyds(X, centers_init, x_squared_norms, max_iter = self.max_iter, true_labels = true_labels)
+			# self.accuracy = accuracy_iter
+			self.labels_ = labels
+
+
 			# labels, inertia, centers, n_iter_ = lloyds(X, centers_init,	x_squared_norms)
-			labels, inertia, centers = lloyds(X, centers_init, x_squared_norms)
 				# max_iter = self.max_iter,
 				# tol = self.tol
 				# x_squared_norms = 
@@ -264,44 +286,32 @@ class Kmeans:
 
 			# compute accuracy
 
-			if true_labels is not None:
-				## best_accuracy
-				accuracy = labelling(labels, true_labels, self.n_clusters, only_accuracy = True)
-				(self.accuracy_list).append(accuracy)
-				if best_accuracy is None or (accuracy > best_accuracy):
-					best_labels = labels
-					best_centers = centers
-					best_accuracy = accuracy
-					# best_n_iter = n_iter_
-			else:
-				## best_inertia
-				if best_inertia is None or (inertia < best_inertia): # and same_clustering
-					best_labels = labels
-					best_centers = centers
-					best_inertia = inertia
-					# best_n_iter = n_iter_
+			# if true_labels is not None:
+			# 	## best_accuracy
+			# 	accuracy = labelling(labels, true_labels, self.n_clusters, only_accuracy = True)
+			# 	(self.accuracy_list).append(accuracy)
+			# 	if best_accuracy is None or (accuracy > best_accuracy):
+			# 		best_labels = labels
+			# 		best_centers = centers
+			# 		best_accuracy = accuracy
+			# 		# best_n_iter = n_iter_
+			# else:
+			# 	## best_inertia
+			# 	if best_inertia is None or (inertia < best_inertia): # and same_clustering
+			# 		best_labels = labels
+			# 		best_centers = centers
+			# 		best_inertia = inertia
+			# 		# best_n_iter = n_iter_
 
 		# ***** selfcopy*****
 		X += X_mean
-		best_centers += X_mean
+		# best_centers += X_mean
 
 
 		# returning
-		self.cluster_centers_ = best_centers
-		self.labels_ = best_labels
-		self.inertia_ = best_inertia
+		# self.cluster_centers_ = best_centers
+		# self.labels_ = best_labels
+		# self.inertia_ = best_inertia
 		# self.n_iter_ = best_n_iter
 
 		return self
-
-	# def predict
-
-	def test_temp(self):
-		print(self.n_clusters)
-
-# k = Kmeans()
-# k.test_temp()
-
-class Temp:
-	def hello(self):
-		print("hello")
