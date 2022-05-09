@@ -8,13 +8,15 @@ def generation(N, D, k, p = 0.4, q = 0.1):
 
 	data = generate_block(N, D, q)
 	labels = []
+	temp = 0
 
 	block_rows, block_columns = int(N/k), int(D/k)
 	for i in range(k):
 		data[i*block_rows:(i+1)*block_rows, i*block_columns:(i+1)*block_columns] = generate_block(block_rows, block_columns, p)
 
 		label_tiled = np.tile([i], (1, block_rows))
-		if labels == []:
+		if temp == 0:
+			temp = 1
 			labels = label_tiled
 		else:
 			labels = np.concatenate((labels, label_tiled), axis = 1)
