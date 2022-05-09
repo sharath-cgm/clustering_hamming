@@ -1,4 +1,3 @@
-# testing using sklearn Kmeans
 
 import numpy as np
 from cluster_labelling import labelling
@@ -8,7 +7,8 @@ from kmeans_hamming import Kmeans
 
 # synthetic dataset
 # dataset = "digit_hamming_2.txt"
-dataset = "N100000_D100_k10_1.txt"
+# dataset = "digits_gray_coded.txt"
+dataset = "N_10000.txt"
 print(dataset)
 data = np.loadtxt(dataset)
 data = data.astype(int)
@@ -34,7 +34,10 @@ accuracy_list = []
 # print("Based on best accuracy, random seeding: ")
 # for i in range(5):
 	# print(i)
-kmeans = Kmeans(init="random", n_clusters=n_clusters, n_init= 50, max_iter = 10)
+	
+# kmeans = Kmeans(init="random", n_clusters=n_clusters, n_init= 50, max_iter = 30, algorithm = "probabilistic_rounding")
+kmeans = Kmeans(init="random", n_clusters=n_clusters, n_init= 50, max_iter = 30, algorithm = "majority_rounding")
+
 # kmeans = Kmeans(init="seeding2", n_clusters=n_clusters, n_init=1)
 kmeans.fit(data, true_labels = labels) #, input_seed = seed)
 

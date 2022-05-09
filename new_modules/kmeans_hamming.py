@@ -4,7 +4,7 @@ from cluster_labelling import labelling
 from sklearn.metrics.pairwise import manhattan_distances
 from seeding import seeding1, seeding2, kmeans_plusplus
 from lloyd_substitute import lloyd_substitute
-from probabilistic_rounding import probabilistic_rounding
+from probabilistic_rounding import probabilistic_rounding, majority_rounding
 from sklearn.metrics import accuracy_score, f1_score
 
 class Kmeans:
@@ -20,10 +20,10 @@ class Kmeans:
 		init = "random",
 		n_init = 10,
 		max_iter = 50,
-		tanh_t = 10
+		tanh_t = 5,
+		algorithm = "probabilistic_rounding"
 		# tol = 1e-4,
 		# seed = None,
-		# algorithm = "lloyd",
 		# random_state = None,
 		# accuracy_list = [],
 		# f1_list = []
@@ -33,8 +33,8 @@ class Kmeans:
 		self.n_init = n_init
 		self.max_iter = max_iter
 		self.tanh_t = tanh_t
+		self.algorithm = algorithm
 		# self.tol = tol
-		# self.algorithm = algorithm
 		# self.random_state = random_state
 		# self.seed = seed,
 		# self.accuracy_list = list(accuracy_list),
@@ -86,7 +86,11 @@ class Kmeans:
 			# labels, inertia, centers = lloyd_substitute(X, centers_init, self.max_iter, true_labels)
 			# labels, centers, accuracy_iter = lloyd_substitute(X, centers_init, self.max_iter, true_labels)
 			# labels, centers = lloyd_substitute(X, centers_init, self.max_iter, true_labels)
-			labels, centers = probabilistic_rounding(X, centers_init, self.max_iter, self.tanh_t, true_labels)
+			
+			if self.algorithm == "probabilistic_rounding":
+				labels, centers = probabilistic_rounding(X, centers_init, self.max_iter, self.tanh_t, true_labels)
+			elif self.algorithm == "majority_rounding":
+				labels, centers = majority_rounding(X, centers_init, self.max_iter, true_labels)
 
 			# self.accuracy = accuracy_iter
 			# print(accuracy_iter, len(accuracy_iter))
