@@ -2,9 +2,10 @@ import random
 import numpy as np
 from cluster_labelling import labelling
 from sklearn.metrics.pairwise import manhattan_distances
-from seeding import seeding1, seeding2, kmeans_plusplus
-from lloyd_substitute import lloyd_substitute
+from seeding import kmeans_plusplus
+# from lloyd_substitute import lloyd_substitute
 from probabilistic_rounding import probabilistic_rounding, majority_rounding
+from large_alphabet_probabilistic_rounding import probabilistic_rounding_large_alphabets, majority_rounding_large_alphabets
 from sklearn.metrics import accuracy_score, f1_score
 
 class Kmeans:
@@ -20,7 +21,7 @@ class Kmeans:
 		init = "random",
 		n_init = 10,
 		max_iter = 50,
-		tanh_t = 5,
+		tanh_t = 7,
 		algorithm = "probabilistic_rounding"
 		# tol = 1e-4,
 		# seed = None,
@@ -66,7 +67,7 @@ class Kmeans:
 		centers, labels
 		"""
 
-		n_samples = X.shape[0]
+		n_samples, n_features = X.shape
 
 		self.accuracy_list = []
 		self.f1_list = []
@@ -74,13 +75,14 @@ class Kmeans:
 		# best_accuracy, best_f1_score, best_labels = None, None, None
 
 		for i in range(self.n_init):
-			print("epoch number: ", i)
+			# print("epoch number: ", i)
 
 			# initialize centers
 			if input_seed == None:
 				centers_init = self._init_centroids(X, init = self.init)
 			else:
 				centers_init = input_seed
+
 
 			# run lloyd's algo
 			# labels, inertia, centers = lloyd_substitute(X, centers_init, self.max_iter, true_labels)
@@ -91,6 +93,18 @@ class Kmeans:
 				labels, centers = probabilistic_rounding(X, centers_init, self.max_iter, self.tanh_t, true_labels)
 			elif self.algorithm == "majority_rounding":
 				labels, centers = majority_rounding(X, centers_init, self.max_iter, true_labels)
+			elif self.algorithm == "probabilistic_rounding_large_alphabets":
+				number_discrete_values_in_features = np.zeros(shape = n_features, dtype = int)
+				for j in range(n_features):
+					number_discrete_values_in_features[j] = len(np.unique(X[:, j]))
+				# print(number_discrete_values_in_features)
+				labels, centers = probabilistic_rounding_large_alphabets(X, centers_init, self.max_iter, self.tanh_t, number_discrete_values_in_features, true_labels)
+			elif self.algorithm == "majority_rounding_large_alphabets":
+				number_discrete_values_in_features = np.zeros(shape = n_features, dtype = int)
+				for j in range(n_features):
+					number_discrete_values_in_features[j] = len(np.unique(X[:, j]))
+				# print(number_discrete_values_in_features)
+				labels, centers = majority_rounding_large_alphabets(X, centers_init, self.max_iter, number_discrete_values_in_features, true_labels)
 
 			# self.accuracy = accuracy_iter
 			# print(accuracy_iter, len(accuracy_iter))
