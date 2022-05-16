@@ -5,7 +5,7 @@ from distance_measures import hamming_distance
 import math
 
 def tanh(x, a, t):
-	exp = np.exp(2*t*a * (x - 1/a))
+	exp = np.exp(t*a * (x - 1/a))
 	return (1 + (a-1)*(exp-1)/(exp + a - 1))/a
 
 def probabilistic_rounding_large_alphabets(X, centers_init, max_iter, tanh_t, number_discrete_values_in_features, true_labels = None):
@@ -106,6 +106,7 @@ def probabilistic_rounding_large_alphabets(X, centers_init, max_iter, tanh_t, nu
 					normalize_p = np.array([1])
 
 				centers[j][k] = np.random.choice(list(range(l)), p = normalize_p)
+				# centers[j][k] = np.random.choice(list(range(l)), p = z)
 
 
 		# for j in range(n_clusters):
