@@ -9,7 +9,7 @@ from kmeans_hamming import Kmeans
 # dataset = "digit_hamming_2.txt"
 # dataset = "digits_gray_coded.txt"
 # dataset = "mushroom_hamming_larger_alphabet.txt"
-dataset = "connect4_hamming_012.txt"
+dataset = "mushroom_hamming_larger_alphabet.txt"
 print(dataset)
 data = np.loadtxt(dataset)
 data = data.astype(int)
@@ -38,8 +38,8 @@ accuracy_list = []
 	
 # kmeans = Kmeans(init="random", n_clusters=n_clusters, n_init= 5, max_iter = 30, algorithm = "probabilistic_rounding", tanh_t= 7)
 # kmeans = Kmeans(init="random", n_clusters=n_clusters, n_init= 10, max_iter = 5, algorithm = "majority_rounding")
-# kmeans = Kmeans(init="random", n_clusters=n_clusters, n_init= 10, max_iter = 30, algorithm = "probabilistic_rounding_large_alphabets", tanh_t = 5)
-kmeans = Kmeans(init="random", n_clusters=n_clusters, n_init= 10, max_iter = 20, algorithm = "majority_rounding_large_alphabets")
+kmeans = Kmeans(init="random", n_clusters=n_clusters, n_init= 10, max_iter = 30, algorithm = "probabilistic_rounding_large_alphabets", tanh_t = )
+# kmeans = Kmeans(init="random", n_clusters=n_clusters, n_init= 20, max_iter = 20, algorithm = "majority_rounding_large_alphabets")
 
 
 # kmeans = Kmeans(init="seeding2", n_clusters=n_clusters, n_init=1)

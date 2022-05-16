@@ -51,7 +51,8 @@ def probabilistic_rounding(X, centers_init, max_iter, tanh_t, true_labels = None
 		# print(iter, "iter")
 		# compute dist to all centers
 		# print(X.shape, centers.shape)
-		pairwise_distance = euclidean_distances(X = X, Y = center_old, squared = True) # Squared euclidean gives similar comparison as hamming distance
+		# pairwise_distance = euclidean_distances(X = X, Y = center_old, squared = True) # Squared euclidean gives similar comparison as hamming distance
+		pairwise_distance = hamming_distance(X = X, Y = center_old)
 		# pairwise_dist = hamming_distance(X = X, Y = centers)
 
 
@@ -79,9 +80,15 @@ def probabilistic_rounding(X, centers_init, max_iter, tanh_t, true_labels = None
 
 		# probabilistic rounding
 		# tanh_t = 10
+		# rand_flips = np.random.uniform(low = -1, high = 1, size = (n_clusters, n_features))
+		# centers = rand_flips < np.tanh( tanh_t* (fraction_of_ones - 0.5))
+		# centers.astype(int)
+
+		# proportional to p
 		rand_flips = np.random.uniform(low = -1, high = 1, size = (n_clusters, n_features))
-		centers = rand_flips < np.tanh( tanh_t* (fraction_of_ones - 0.5))
+		centers = rand_flips < np.tanh(tanh_t * (fraction_of_ones - 0.5))
 		centers.astype(int)
+
 
 		# majority rounding
 		# centers = fraction_of_ones > 0.5
