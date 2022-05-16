@@ -12,6 +12,13 @@ def generate_block(m, n, a, sigma, p):
 
 	return block
 
+def generate_vector(m, a, sigma, p):
+	rest_prob = (1-p)/(sigma - 1)
+	probability = [rest_prob] * sigma
+	probability[a] = p
+
+	return np.random.choice(range(sigma), size = m, p = probability) #/sum(probability))
+
 
 def generation(N, D, k, sigma, p):
 	# written for k = 2
@@ -23,8 +30,16 @@ def generation(N, D, k, sigma, p):
 	n = int(N/2)
 	d = int(D/2)
 	data = np.random.randint(low = 0, high = sigma, size = (N, D), dtype = int)
-	data[0:n, 0:d] = generate_block(n, d, a[0:d], sigma, p)
-	data[n:N, d:D] = generate_block(n, d, a[d:D], sigma, p)
+
+	for i in range(d):
+		data[0:n, i] = generate_vector(n, a[i], sigma, p)
+
+	for i in range(d, D):
+		data[n:N, i] = generate_vector(n, a[i], sigma, p)
+
+
+	# data[0:n, 0:d] = generate_block(n, d, a[0:d], sigma, p)
+	# data[n:N, d:D] = generate_block(n, d, a[d:D], sigma, p)
 
 
 	labels = np.zeros(shape= (N, 1), dtype = int)
@@ -38,8 +53,10 @@ def generation(N, D, k, sigma, p):
 
 N, D, k = 50000, 500, 2
 # N, D, k = 20, 20, 2
-# sigma, p = 5, 0.5
-sigma, p = 5, 0.3
+# sigma, p = 5, 1
+
+sigma, p = 5, 0.5
+# sigma, p = 5, 0.3
 # sigma, p = 20, 0.25
 # sigma, p = 20, 0.1
 
