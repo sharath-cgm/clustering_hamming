@@ -98,6 +98,9 @@ def probabilistic_rounding_large_alphabets(X, centers_init, max_iter, tanh_t, nu
 					# probability[i] = tanh(distance_from_simplex_vertices[i], l, tanh_t)
 					probability[i] = tanh(z[i], l, tanh_t)
 
+					probability[i] = z[i]**2
+					print(probability)
+
 				# print("tanh p",p, "\n")
 				total = np.sum(probability)
 				if total != 0:
@@ -105,6 +108,7 @@ def probabilistic_rounding_large_alphabets(X, centers_init, max_iter, tanh_t, nu
 				else:
 					normalize_p = np.array([1])
 
+				print(normalize_p)
 				centers[j][k] = np.random.choice(list(range(l)), p = normalize_p)
 				# centers[j][k] = np.random.choice(list(range(l)), p = z)
 
