@@ -2,6 +2,7 @@ from sklearn.cluster import DBSCAN
 from sklearn.cluster import Birch
 from sklearn.cluster import AgglomerativeClustering
 from sklearn.cluster import KMeans
+from sklearn.mixture import GaussianMixture
 
 import numpy as np
 from cluster_labelling import labelling
@@ -22,7 +23,7 @@ data = dataset[:, 0:-1]
 
 print(f"# classes: {n_clusters}; # samples: {n_samples}; # features {n_features}")
 
-
+"""
 ######## DBScan
 print("\nResults of DBSCAN:\n")
 best_accuracy, best_f1 = None, None
@@ -171,3 +172,33 @@ for _ in range(no_epochs):
 
 accuracy_analysis(accuracy_list)
 f1_analysis(f1_list)
+
+"""
+
+### gaussian mixture
+print("Results of Gaussian mixture\n")
+
+best_accuracy, best_f1 = None, None
+accuracy_list, f1_list = [], []
+
+no_epochs= 5
+for _ in range(no_epochs):
+	gm = GaussianMixture(n_components = n_clusters)
+	gm.fit(data)
+
+	predicted_labels = labelling(gm.predict(data), labels, n_clusters, n_samples)
+
+	accuracy = accuracy_score(labels, predicted_labels)
+	# print(predicted_labels)
+
+	accuracy_list.append(accuracy)
+
+	f1 = f1_score(labels, predicted_labels, average='macro')
+	f1_list.append(f1)
+
+
+accuracy_analysis(accuracy_list)
+f1_analysis(f1_list)
+
+
+
