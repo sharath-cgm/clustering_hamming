@@ -100,7 +100,7 @@ class Kmeans:
 				for j in range(n_features):
 					number_discrete_values_in_features[j] = len(np.unique(X[:, j]))
 				# print(number_discrete_values_in_features)
-				labels, centers = probabilistic_rounding_large_alphabets(X, centers_init, self.max_iter, self.tanh_t, number_discrete_values_in_features, true_labels)
+				labels, centers = probabilistic_rounding_large_alphabets(X, centers_init, self.max_iter, self.tanh_t, self.t, number_discrete_values_in_features, true_labels)
 			elif self.algorithm == "majority_rounding_large_alphabets":
 				number_discrete_values_in_features = np.zeros(shape = n_features, dtype = int)
 				for j in range(n_features):

@@ -36,9 +36,9 @@ accuracy_list = []
 # for i in range(5):
 	# print(i)
 	
-kmeans = Kmeans(init="random", n_clusters=n_clusters, n_init= 15, max_iter = 30, algorithm = "probabilistic_rounding", t = 4)
+# kmeans = Kmeans(init="random", n_clusters=n_clusters, n_init= 2, max_iter = 30, algorithm = "probabilistic_rounding", t = 4)
 # kmeans = Kmeans(init="random", n_clusters=n_clusters, n_init= 10, max_iter = 5, algorithm = "majority_rounding")
-# kmeans = Kmeans(init="random", n_clusters=n_clusters, n_init= 10, max_iter = 30, algorithm = "probabilistic_rounding_large_alphabets", t = 2)
+kmeans = Kmeans(init="random", n_clusters=n_clusters, n_init= 10, max_iter = 30, algorithm = "probabilistic_rounding_large_alphabets", t = 2)
 # kmeans = Kmeans(init="random", n_clusters=n_clusters, n_init= 20, max_iter = 20, algorithm = "majority_rounding_large_alphabets")
 
 
