@@ -101,7 +101,7 @@ def probabilistic_rounding_large_alphabets(X, centers_init, max_iter, tanh_t, t,
 					# probability[i] = z[i]**2
 					# print(probability)
 
-				probability = z**t
+				probability = (z[0:l])**t
 
 				# print("tanh p",p, "\n")
 				total = np.sum(probability)
